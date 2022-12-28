@@ -1,9 +1,12 @@
 const fs = require("fs");
+const path = require("path");
 
 module.exports = class JsonDb {
     constructor(tableName) {
         // console.log(__dirname)
-        this.tableFile = `${__dirname + '/jsondb/' + tableName}.json`
+
+        // console.log(path.join(rundir, "jsondb", `${tableName}.json`))
+        this.tableFile = path.join(rundir, "jsondb", `${tableName}.json`)
     }
 
     all() {
@@ -13,11 +16,22 @@ module.exports = class JsonDb {
     find(id) {
         let items = JSON.parse(fs.readFileSync(this.tableFile, 'utf8'));
         for (let i = 0; i < items.length; i++) {
+            
             if (items[i].id == id) {
                 return items[i];
             }
         }
-        return { "error": "not find" }
+        return { "error": "not found" }
+    }
+
+    where(field, value) {
+        let items = JSON.parse(fs.readFileSync(this.tableFile, 'utf8'));
+        for (let item of items) {
+            if (item[field] == value) {
+                return item
+            }
+        }
+        return { "error": "not found" }
     }
 
     create(item) {
@@ -28,7 +42,7 @@ module.exports = class JsonDb {
             id = id > items[i].id ? id : items[i].id;
         }
 
-        item.id = id !== 0 ? id + 1 : 0;
+        item.id = id + 1;
 
         items.push(item);
 
@@ -48,7 +62,6 @@ module.exports = class JsonDb {
         }
         if (item) {
             for (let key in arrParams) {
-                // console.log(key)
                 item[key] = arrParams[key];
             }
             fs.writeFileSync(this.tableFile, JSON.stringify(items));

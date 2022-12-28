@@ -1,6 +1,11 @@
-// import JsonDb from "./jsondb.js"
-const JsonDb = require("./utils/jsondb.js")
 const express = require("express")
+const { config } = require("dotenv");
+const path = require('path')
+
+rundir = path.join(__dirname)
+config()
+
+// console.log(process.env.SALT)
 
 const app = express();
 

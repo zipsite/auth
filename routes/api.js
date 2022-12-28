@@ -1,10 +1,25 @@
 const express = require('express')
 const router = express.Router()
+const BookController = new (require('../http/controllers/BookController.js'))()
+const AuthController = new (require('../http/controllers/AuthController.js'))()
 
-router.get('/book', (req, res) => {res.send("index")})
-router.get('/book/:bookId', (req, res) => {res.send("show")})
-router.post('/book', (req, res) => {res.send("store")})
-router.put('/book/:bookId', (req, res) => {res.send("update")})
-router.delete('/book/:bookId', (req, res)=>{res.send("delete")})
+
+router.use('/auth', (() => {
+    const router = express.Router()
+    router.post('/signup', AuthController.signup)
+    router.post('/login', AuthController.login)
+    router.post('/logout', AuthController.logout)
+    router.post('/refresh', AuthController.refresh)
+    router.post('/me', AuthController.me)
+    return router
+})())
+
+
+
+router.get('/book', BookController.index)
+router.get('/book/:bookId', BookController.show)
+router.post('/book', BookController.store)
+router.put('/book/:bookId', BookController.update)
+router.delete('/book/:bookId', BookController.delete)
 
 module.exports = router
