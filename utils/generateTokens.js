@@ -3,7 +3,7 @@ const UserToken = new (require("../models/UserToken.js"))()
 
 const generateTokens = async (user) => {
     try {
-        const payload = { _id: user._id, roles: user.roles };
+        const payload = { id: user.id, role: user.role};
         const accessToken = jwt.sign(
             payload,
             process.env.ACCESS_TOKEN_PRIVATE_KEY,
@@ -15,10 +15,10 @@ const generateTokens = async (user) => {
             { expiresIn: "30d" }
         );
 
-        const userToken = await UserToken.where("userId", user._id);
-        if (!userToken.error) await UserToken.delete(userToken.id);
+        const userToken = UserToken.where("userId", user._id);
+        if (!userToken.error) UserToken.delete(userToken.id);
 
-        await UserToken.create({ userId: user._id, token: refreshToken })
+        UserToken.create({ userId: user._id, token: refreshToken })
         return Promise.resolve({ accessToken, refreshToken });
     } catch (err) {
         return Promise.reject(err);

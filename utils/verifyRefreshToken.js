@@ -11,7 +11,7 @@ const verifyRefreshToken = (refreshToken) => {
             return reject({ error: true, message: "Invalid refresh token" });
 
         jwt.verify(refreshToken, privateKey, (err, tokenDetails) => {
-            console('verify')
+            console.log('verify')
             if (err)
                 return reject({ error: true, message: "Invalid refresh token" });
             

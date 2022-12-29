@@ -1,20 +1,16 @@
 const User = new (require("../../models/User.js"))();
 const UserToken = new (require("../../models/UserToken.js"))()
 const bcrypt = require("bcrypt");
-const generateTokens = require("../../utils/generateToken.js")
+const jwt = require("jsonwebtoken")
+const generateTokens = require("../../utils/generateTokens.js")
 const verifyRefreshToken = require("../../utils/verifyRefreshToken.js")
+const verifyAccessToken = require("../../utils/verifyAccessToken.js")
 
 
 module.exports = class AuthController {
     async signup(req, res) {
         try {
-            // const { error } = signUpBodyValidation(req.body);
-            // if (error)
-            //     return res
-            //         .status(400)
-            //         .json({ error: true, message: error.details[0].message });
-
-            const user = await User.where("email", req.body.email);
+            const user = User.where("email", req.body.email);
             if (user.email)
                 return res
                     .status(400)
@@ -35,13 +31,7 @@ module.exports = class AuthController {
     }
     async login(req, res) {
         try {
-            // const { error } = logInBodyValidation(req.body);
-            // if (error)
-            //     return res
-            //         .status(400)
-            //         .json({ error: true, message: error.details[0].message });
-
-            const user = await User.where("email", req.body.email);
+            const user = User.where("email", req.body.email);
             if (user.error)
                 return res
                     .status(401)
@@ -71,19 +61,13 @@ module.exports = class AuthController {
     }
     async logout(req, res) {
         try {
-            // const { error } = refreshTokenBodyValidation(req.body);
-            // if (error)
-            //     return res
-            //         .status(400)
-            //         .json({ error: true, message: error.details[0].message });
-    
-            const userToken = await UserToken.where("token", req.body.refreshToken);
+            const userToken = UserToken.where("token", req.body.refreshToken);
             if (userToken.error)
                 return res
                     .status(200)
                     .json({ error: false, message: "Logged Out Sucessfully" });
     
-            await UserToken.delete(userToken.id);
+            UserToken.delete(userToken.id);
             res.status(200).json({ error: false, message: "Logged Out Sucessfully" });
         } catch (err) {
             console.log(err);
@@ -91,21 +75,17 @@ module.exports = class AuthController {
         }
     }
     async refresh(req, res) {
-        // const { error } = refreshTokenBodyValidation(req.body);
-        // if (error)
-        //     return res
-        //         .status(400)
-        //         .json({ error: true, message: error.details[0].message });
-
         verifyRefreshToken(req.body.refreshToken)
             .then(({ tokenDetails }) => {
-                console.log('token')
-                const payload = { _id: tokenDetails._id, roles: tokenDetails.roles };
+                const payload = { id: tokenDetails.id, role: tokenDetails.role};
+                console.log(payload)
                 const accessToken = jwt.sign(
                     payload,
                     process.env.ACCESS_TOKEN_PRIVATE_KEY,
                     { expiresIn: "14m" }
                 );
+
+                // console.log(jwt.sign(payload, process.env.ACCESS_TOKEN_PRIVATE_KEY, { expiresIn: "14m" }))
                 res.status(200).json({
                     error: false,
                     accessToken,
@@ -115,6 +95,17 @@ module.exports = class AuthController {
             .catch((err) => res.status(400).json(err));
     }
     me(req, res) {
-        res.send("me")
+        const accessToken = (req.get("authorization")).replace(/Bearer /, "")
+        verifyAccessToken(accessToken)
+            .then(({tokenDetails}) => {
+                const user = User.find(tokenDetails.id)
+                if (user.error)
+                    return res
+                        .status(401)
+                        .json({ error: true, message: "User not found" });
+                
+                res.status(200).json(user)
+            })
+            .catch((err) => res.status(400).json(err));
     }
 }
