@@ -11,6 +11,12 @@ module.exports = class BookController {
     }
     store(req, res) {
         if (!req.body) return res.sendStatus(400);
+        if (req.authData.role != "admin") return res.status(401).json({
+            error: true,
+            message: "Permission denied"
+        })
+
+
 
         let result = Book.create({
             name: req.body.name,
@@ -21,6 +27,10 @@ module.exports = class BookController {
     }
     update(req, res) {
         if (!req.body) return res.sendStatus(400);
+        if (req.authData.role != "admin") return res.status(401).json({
+            error: true,
+            message: "Permission denied"
+        })
 
         let result = Book.update(req.params.bookId, {
             name: req.body.name,
@@ -30,6 +40,11 @@ module.exports = class BookController {
         res.send(result)
     }
     delete(req, res) {
+        if (req.authData.role != "admin") return res.status(401).json({
+            error: true,
+            message: "Permission denied"
+        })
+
         let result = Book.delete(req.params.bookId);
         res.send(result)
     }

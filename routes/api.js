@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const BookController = new (require('../http/controllers/BookController.js'))()
 const AuthController = new (require('../http/controllers/AuthController.js'))()
+const auth = require("../http/middleware/auth.js")
 
 
 router.use('/auth', (() => {
@@ -14,7 +15,7 @@ router.use('/auth', (() => {
     return router
 })())
 
-
+router.use(auth)
 
 router.get('/book', BookController.index)
 router.get('/book/:bookId', BookController.show)
