@@ -15,12 +15,15 @@ router.use('/auth', (() => {
     return router
 })())
 
-router.use(auth)
-
-router.get('/book', BookController.index)
-router.get('/book/:bookId', BookController.show)
-router.post('/book', BookController.store)
-router.put('/book/:bookId', BookController.update)
-router.delete('/book/:bookId', BookController.delete)
+router.use((() => {
+    const router = express.Router()
+    router.use(auth)
+    router.get('/book', BookController.index)
+    router.get('/book/:bookId', BookController.show)
+    router.post('/book', BookController.store)
+    router.put('/book/:bookId', BookController.update)
+    router.delete('/book/:bookId', BookController.delete)
+    return router
+})())
 
 module.exports = router

@@ -1,7 +1,8 @@
 module.exports = validateModel = (struct, params) => {
     for (let key in struct) {
-        console.log((key) in params)
         if ((key in params)) {
+            console.log(typeof params[key])
+            console.log(struct[key].type)
             if (!((typeof params[key]) === struct[key].type)) {
                 return {
                     error: true,

@@ -2,17 +2,17 @@ const Model = require("./Model.js")
 module.exports = class User extends Model {
     struct = {
         name: {
-            type: String,
+            type: "string",
         },
         email: {
-            type: String
+            type: "string"
         },
         role: {
-            type: String,
+            type: "string",
             enum: ["user", "admin"]
         },
         password: {
-            type: String
+            type: "string"
         }
     }
 }

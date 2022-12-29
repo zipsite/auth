@@ -5,7 +5,6 @@ const path = require('path')
 rundir = path.join(__dirname)
 config()
 
-// console.log(process.env.SALT)
 
 const app = express();
 

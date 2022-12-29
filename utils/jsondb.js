@@ -3,9 +3,7 @@ const path = require("path");
 
 module.exports = class JsonDb {
     constructor(tableName) {
-        // console.log(__dirname)
 
-        // console.log(path.join(rundir, "jsondb", `${tableName}.json`))
         this.tableFile = path.join(rundir, "jsondb", `${tableName}.json`)
     }
 

@@ -19,13 +19,16 @@ module.exports = class AuthController {
             const salt = await bcrypt.genSalt(Number(process.env.SALT));
             const hashPassword = await bcrypt.hash(req.body.password, salt);
 
-            await User.create({ ...req.body, password: hashPassword });
-
+            let result = User.create({ ...req.body, password: hashPassword });
+            if (result.error == true) {
+                return res
+                .status(400)
+                .json(result)
+            }
             res
                 .status(201)
                 .json({ error: false, message: "Account created sucessfully" });
         } catch (err) {
-            console.log(err);
             res.status(500).json({ error: true, message: "Internal Server Error" });
         }
     }
@@ -55,7 +58,7 @@ module.exports = class AuthController {
                 message: "Logged in sucessfully",
             });
         } catch (err) {
-            console.log(err);
+
             res.status(500).json({ error: true, message: "Internal Server Error" });
         }
     }
@@ -70,7 +73,6 @@ module.exports = class AuthController {
             UserToken.delete(userToken.id);
             res.status(200).json({ error: false, message: "Logged Out Sucessfully" });
         } catch (err) {
-            console.log(err);
             res.status(500).json({ error: true, message: "Internal Server Error" });
         }
     }
@@ -78,14 +80,11 @@ module.exports = class AuthController {
         verifyRefreshToken(req.body.refreshToken)
             .then(({ tokenDetails }) => {
                 const payload = { id: tokenDetails.id, role: tokenDetails.role};
-                console.log(payload)
                 const accessToken = jwt.sign(
                     payload,
                     process.env.ACCESS_TOKEN_PRIVATE_KEY,
                     { expiresIn: "14m" }
                 );
-
-                // console.log(jwt.sign(payload, process.env.ACCESS_TOKEN_PRIVATE_KEY, { expiresIn: "14m" }))
                 res.status(200).json({
                     error: false,
                     accessToken,

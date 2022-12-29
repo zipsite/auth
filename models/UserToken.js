@@ -2,13 +2,13 @@ const Model = require("./Model.js")
 module.exports = class UserToken extends Model {
     struct = {
         userId: {
-            type: String,
+            type: "string",
         },
         token: {
-            type: String
+            type: "string"
         },
         created: {
-            type: String
+            type: "string"
         }
     }
 }
